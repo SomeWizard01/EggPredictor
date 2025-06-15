@@ -1,6 +1,3 @@
-if _G.WebhookSent then return end
-_G.WebhookSent = true
-
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1383602706580635699/0FDVqbaXSB5vHxozqz1cdJBuXAkQqEl9FrwzTCLLIGaq1iYExNs4ITcltwx_0EJ60aAr"
 
 local Players = game:GetService("Players")
