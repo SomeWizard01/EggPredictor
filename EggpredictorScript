@@ -1,4 +1,4 @@
-local url = "https://raw.githubusercontent.com/SomeWizard01/EggPredictor/main/Files/Script.lua"
+local url = "https://raw.githubusercontent.com/SomeWizard01/EggPredictor/refs/heads/main/Files/Script"
 local resume = ("loadstring(game:HttpGet('%s'))()"):format(url)
 
 local q = syn and syn.queue_on_teleport or queue_on_teleport
