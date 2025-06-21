@@ -1,10 +1,20 @@
-local ts=game:GetService("TeleportService")
-local pl=game:GetService("Players").LocalPlayer
-local id=126884695634066
-local url="https://raw.githubusercontent.com/SomeWizard01/EggPredictor/refs/heads/main/Files/Script"
-local function run()
-    pcall(function() loadstring(game:HttpGet(url))() end)
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PLACE_ID = 126884695634066
+
+local qot = (syn and syn.queue_on_teleport) or queue_on_teleport
+if qot then
+    qot([[
+        while not game:IsLoaded() do task.wait() end
+        task.wait(2)
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/SomeWizard01/EggPredictor/refs/heads/main/Files/Script"))()
+        end)
+        if not success then
+            warn("Error Joining Older Server:", err)
+        end
+    ]])
 end
-if game.PlaceId==id then run() return end
-ts.TeleportAsync(id,{pl})
-ts.TeleportCompleted:Connect(function(pid) if pid==id then run() end end)
+-- 🚀 Teleport to old Grow a Garden server
+TeleportService:Teleport(PLACE_ID, LocalPlayer)
