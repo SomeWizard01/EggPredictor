@@ -1,11 +1,14 @@
-local url = "https://raw.githubusercontent.com/SomeWizard01/EggPredictor/main/Files/Script"
-local resume = string.format("loadstring(game:HttpGet('%s'))()", url)
+local url = "https://raw.githubusercontent.com/SomeWizard01/EggPredictor/main/Files/Script.lua"
+local resume = ("loadstring(game:HttpGet('%s'))()"):format(url)
 
-local queue = syn and syn.queue_on_teleport or queue_on_teleport
-if queue then
-    queue(resume)
+local q = syn and syn.queue_on_teleport or queue_on_teleport
+if q then
+    q(resume)
 end
 
-task.delay(0.5, function()
-    game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
+task.spawn(function()
+    task.wait(1) -- ensure queue is registered BEFORE teleport fires
+    local TeleportService = game:GetService("TeleportService")
+    local Players = game:GetService("Players")
+    TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
 end)
