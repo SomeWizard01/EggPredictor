@@ -1,3 +1,3 @@
 local L='loadstring(game:HttpGet("https://raw.githubusercontent.com/SomeWizard01/EggPredictor/refs/heads/main/Files/Script"))()'
 (syn and syn.queue_on_teleport or queue_on_teleport)(L)
-game:GetService("TeleportService"):Teleport(14568501930, game.Players.LocalPlayer)
+game:GetService("TeleportService"):Teleport(126884695634066, game.Players.LocalPlayer)
